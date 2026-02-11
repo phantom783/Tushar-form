@@ -2,10 +2,13 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 function EmployeeTable() {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [apiConfigError, setApiConfigError] = useState("");
   const [page, setPage] = useState(1);
   const [editingId, setEditingId] = useState(null);
   const [editData, setEditData] = useState({});
@@ -14,14 +17,21 @@ function EmployeeTable() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchEmployees();
+    if (!API_BASE_URL || API_BASE_URL === "undefined") {
+      setApiConfigError(
+        "⚠️ Backend API URL is not configured. Please set VITE_API_BASE_URL environment variable."
+      );
+      setLoading(false);
+    } else {
+      fetchEmployees();
+    }
   }, [page]);
 
   const fetchEmployees = async () => {
     try {
       setLoading(true);
-      console.log("Fetching employees from", import.meta.env.VITE_API_BASE_URL);
-      const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/employees`, {
+      console.log("Fetching employees from", API_BASE_URL);
+      const response = await axios.get(`${API_BASE_URL}/employees`, {
         params: { page, limit: 5 },
       });
       console.log("Response data:", response.data);
@@ -66,7 +76,7 @@ function EmployeeTable() {
   const handleSave = async (empId) => {
     try {
       console.log("Saving employee:", empId, editData);
-      await axios.put(`${import.meta.env.VITE_API_BASE_URL}/employees/${empId}`, editData);
+      await axios.put(`${API_BASE_URL}/employees/${empId}`, editData);
       setEditingId(null);
       setEditData({});
       fetchEmployees();
@@ -89,7 +99,7 @@ function EmployeeTable() {
 
     try {
       console.log("Deleting employee:", empId);
-      await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/employees/${empId}`);
+      await axios.delete(`${API_BASE_URL}/employees/${empId}`);
       fetchEmployees();
       setError("");
     } catch (err) {
@@ -104,6 +114,20 @@ function EmployeeTable() {
     <div style={{ padding: "20px" }}>
       <h1>Employee List</h1>
       <button onClick={handleAddClick} style={{ backgroundColor: "#4CAF50", color: "white", padding: "8px 16px", border: "none", borderRadius: "4px", cursor: "pointer", width: "auto" }}>Add Employee</button>
+
+      {apiConfigError && (
+        <div style={{
+          backgroundColor: "#f8d7da",
+          border: "1px solid #f5c6cb",
+          color: "#721c24",
+          padding: "12px",
+          marginBottom: "15px",
+          marginTop: "15px",
+          borderRadius: "4px"
+        }}>
+          {apiConfigError}
+        </div>
+      )}
 
       {error && <p style={{ color: "red" }}>{error}</p>}
 

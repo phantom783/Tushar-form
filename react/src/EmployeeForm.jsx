@@ -2,8 +2,20 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./index.css";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 function EmployeeForm() {
   const navigate = useNavigate();
+  const [apiErrorMessage, setApiErrorMessage] = useState("");
+
+  useEffect(() => {
+    if (!API_BASE_URL || API_BASE_URL === "undefined") {
+      setApiErrorMessage(
+        "⚠️ Backend API URL is not configured. Please set VITE_API_BASE_URL environment variable."
+      );
+    }
+  }, []);
+
   const generateEmployeeCode = () => {
     return Math.floor(1000 + Math.random() * 9000);
   };
@@ -21,6 +33,11 @@ function EmployeeForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!API_BASE_URL || API_BASE_URL === "undefined") {
+      setError("Cannot submit: Backend API URL is not configured.");
+      return;
+    }
 
     const dobDate = new Date(dob);
     const minJoiningDate = new Date(dobDate);
@@ -42,7 +59,7 @@ function EmployeeForm() {
     };
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/employees`, {
+      const response = await fetch(`${API_BASE_URL}/employees`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -68,6 +85,19 @@ function EmployeeForm() {
   return (
     <form onSubmit={handleSubmit}>
       <h1>Joining Form</h1>
+
+      {apiErrorMessage && (
+        <div style={{ 
+          backgroundColor: "#fff3cd", 
+          border: "1px solid #ffc107", 
+          color: "#856404", 
+          padding: "12px", 
+          marginBottom: "15px", 
+          borderRadius: "4px" 
+        }}>
+          {apiErrorMessage}
+        </div>
+      )}
 
       <fieldset>
         <legend className='border'><strong>Personal Information</strong></legend>

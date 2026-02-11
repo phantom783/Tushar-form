@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 function SalaryMaster() {
   const [employeeCode, setEmployeeCode] = useState("");
@@ -8,7 +10,16 @@ function SalaryMaster() {
   const [conveyance, setConveyance] = useState(0);
   const [otherAllowance, setOtherAllowance] = useState(0);
   const [error, setError] = useState("");
+  const [apiConfigError, setApiConfigError] = useState("");
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!API_BASE_URL || API_BASE_URL === "undefined") {
+      setApiConfigError(
+        "⚠️ Backend API URL is not configured. Please set VITE_API_BASE_URL environment variable."
+      );
+    }
+  }, []);
 
   const gross =
     Number(basic) +
@@ -33,6 +44,11 @@ function SalaryMaster() {
     e.preventDefault();
     setError("");
 
+    if (!API_BASE_URL || API_BASE_URL === "undefined") {
+      setError("Cannot submit: Backend API URL is not configured.");
+      return;
+    }
+
     if (!employeeCode) {
       setError("Employee Code is required");
       return;
@@ -56,7 +72,7 @@ function SalaryMaster() {
     };
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/salary-master`, {
+      const res = await fetch(`${API_BASE_URL}/salary-master`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(salaryData),
@@ -94,6 +110,19 @@ function SalaryMaster() {
       </button>
 
       <form onSubmit={handleSubmit} style={{ maxWidth: "600px" }}>
+        {apiConfigError && (
+          <div style={{
+            backgroundColor: "#f8d7da",
+            border: "1px solid #f5c6cb",
+            color: "#721c24",
+            padding: "12px",
+            marginBottom: "15px",
+            borderRadius: "4px"
+          }}>
+            {apiConfigError}
+          </div>
+        )}
+
         {error && <p style={{ color: "red", marginBottom: "15px" }}>{error}</p>}
 
         <fieldset style={{ marginBottom: "20px", padding: "15px", borderRadius: "5px", border: "1px solid #ddd" }}>
