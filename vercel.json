@@ -1,0 +1,4 @@
+{
+  "buildCommand": "cd react && npm ci && npm run build",
+  "outputDirectory": "react/dist"
+}
