@@ -17,7 +17,7 @@ function SalaryList() {
   const fetchSalaries = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("http://localhost:5000/salary-master", {
+      const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/salary-master`, {
         params: { page, limit: 5 },
       });
       setSalaries(response.data.data || []);
@@ -36,7 +36,7 @@ function SalaryList() {
     }
 
     try {
-      await axios.delete(`http://localhost:5000/salary-master/${salaryId}`);
+      await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/salary-master/${salaryId}`);
       fetchSalaries();
       setError("");
     } catch (err) {

@@ -42,7 +42,7 @@ function EmployeeForm() {
     };
 
     try {
-      const response = await fetch("http://localhost:5000/employees", {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/employees`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

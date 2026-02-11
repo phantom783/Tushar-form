@@ -20,8 +20,8 @@ function EmployeeTable() {
   const fetchEmployees = async () => {
     try {
       setLoading(true);
-      console.log("Fetching employees from http://localhost:5000/employees");
-      const response = await axios.get("http://localhost:5000/employees", {
+      console.log("Fetching employees from", import.meta.env.VITE_API_BASE_URL);
+      const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/employees`, {
         params: { page, limit: 5 },
       });
       console.log("Response data:", response.data);
@@ -66,7 +66,7 @@ function EmployeeTable() {
   const handleSave = async (empId) => {
     try {
       console.log("Saving employee:", empId, editData);
-      await axios.put(`http://localhost:5000/employees/${empId}`, editData);
+      await axios.put(`${import.meta.env.VITE_API_BASE_URL}/employees/${empId}`, editData);
       setEditingId(null);
       setEditData({});
       fetchEmployees();
@@ -89,7 +89,7 @@ function EmployeeTable() {
 
     try {
       console.log("Deleting employee:", empId);
-      await axios.delete(`http://localhost:5000/employees/${empId}`);
+      await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/employees/${empId}`);
       fetchEmployees();
       setError("");
     } catch (err) {
